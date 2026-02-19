@@ -1,0 +1,32 @@
+pipeline {
+agent any
+environment {
+IMAGE_NAME = 'flaskapp:v1'
+}
+stages {
+stage('Clone Code') {
+steps {
+git 'https://github.com/yourusername/python-flask-docker-sample.git'
+}
+}
+stage('Build Docker Image') {
+steps {
+sh 'docker build -t $IMAGE_NAME .'
+}
+}
+stage('Run Docker Container') {
+steps {
+sh 'docker rm -f flaskapp || true'
+sh 'docker run -d --name flaskapp -p 5000:5000 $IMAGE_NAME'
+}
+}
+}
+post {
+success {
+echo '✅ App deployed successfully at http://<your-ip>:5000'
+}
+failure {
+echo '❌ Build failed.'
+}
+}
+}
